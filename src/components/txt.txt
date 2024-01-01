@@ -1,0 +1,42 @@
+const handleSelect = async () => {
+    //check whether group(chats in firestore) exist, if not create
+    // alert("clicked");
+    const combinedId =
+      currentUser.uid > user.uid
+        ? currentUser.uid + user.uid
+        : user.uid + currentUser.uid;
+    console.log(user);
+    console.log(currentUser);
+    console.log(combinedId);
+    console.log(user.uid);
+    console.log(currentUser.uid);
+    try {
+      const res = await getDoc(doc(db, "chats", combinedId));
+      const chatsDoc = await getDoc(res);
+      if (!res.exists()) {
+        //create Chats
+        await setDoc(doc(db, "chats", combinedId), { message: [] });
+      }
+      //create userChats
+      await updateDoc(doc(db, "userChats", currentUser.uid), {
+        [combinedId + ".userInfo"]: {
+          uid: user.id,
+          displayName: user.displayName,
+          photoURL: user.photoURL,
+        },
+        [combinedId + ".date"]: serverTimestamp(),
+      });
+      await updateDoc(doc(db, "userChats", user.uid), {
+        [combinedId + ".userInfo"]: {
+          uid: currentUser.id,
+          displayName: currentUser.displayName,
+          photoURL: currentUser.photoURL,
+        },
+        [combinedId + ".date"]: serverTimestamp(),
+      });
+    } catch (err) {
+      console.log("ERROR: ", err);
+    }
+
+    //create userchats
+  };
